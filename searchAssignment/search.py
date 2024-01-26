@@ -144,6 +144,7 @@ def breadth_first_graph_search(problem):
     node = Node(problem.initial)  # FIFO queue
     if problem.goal_test(node.state):
         return node, None
+    return breadth_first_graph_search(problem, node)
     print("breadth_first_graph_search: to be done by students")
     return None, None
 
