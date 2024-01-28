@@ -206,6 +206,8 @@ class Gui(VacuumEnvironment):
             self.agent.direction = 'UP'
             self.buttons[yi][xi].config(bg='white', text='', state='normal')
             self.buttons[yi][xi].config(bg='white', text=agent_label(self.agent), state='normal')
+            #if len(self.agents) == 0:
+            #    self.add_agent(self.agent, (yi, xi))
         
         self.searchType = searchTypes[0]
         self.agent.performance = 0
@@ -385,7 +387,7 @@ class Gui(VacuumEnvironment):
                         for thing in self.list_things_at((i, j)):
                             if not isinstance(thing, Agent):
                                 self.delete_thing(thing)
-                    if btn['bg'] == 'grey' or btn['bg'] == 'brown':  # adding dirt
+                    if btn['bg'] == 'grey':  # adding dirt
                         self.add_thing(Dirt(), (i, j))
                         self.dirtCount += 1
                     elif btn['bg'] == 'red':  # adding wall
@@ -452,7 +454,10 @@ class Gui(VacuumEnvironment):
         else:
             self.turnCostOn = False
             turn_button.config(bg = "grey")
-        self.reset_env()
+        #self.reset_env()
+        self.searchAgent = VacuumPlanning(self, self.searchType)
+        self.searchAgent.generateSolution()
+        self.done = False
         
 
 
@@ -485,11 +490,11 @@ if __name__ == "__main__":
     topframe = Frame(win, bg='black')
     topframe.pack(side='top')
 
-    wid = 8
+    wid = 20
     if len(sys.argv) > 1:
         wid = int(sys.argv[1])
 
-    hig = 6
+    hig = 18
     if len(sys.argv) > 2:
         hig = int(sys.argv[2])
 

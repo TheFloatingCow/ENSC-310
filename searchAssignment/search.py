@@ -192,7 +192,6 @@ def breadth_first_graph_search(problem):
                 if problem.goal_test(child.state):
                     return child, None
                 frontier.append(child)
-    
 
 
 def depth_first_graph_search(problem):
