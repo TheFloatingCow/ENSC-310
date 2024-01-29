@@ -191,12 +191,7 @@ def best_first_graph_search(problem, f=None):
     first search; if f is node.depth then we have breadth-first search.
     There is a subtlety: the line "f = memoize(f, 'f')" means that the f
     values will be cached on the nodes as they are computed. So after doing
-    a best first search you can examine the f values of the path returned."""
-    """
-    f = memoize(f or problem.h, 'f')
-    node = Node(problem.initial)
-    print("best_first_graph_search: to be done by students")
-    return None, None
+    a best first search you can examine the f values of the path returned.
     """
     f = memoize(f or problem.h, 'f')
     node = Node(problem.initial)
@@ -222,7 +217,7 @@ def best_first_graph_search(problem, f=None):
 
 def uniform_cost_search(problem):
     """[Figure 3.14]"""
-    return best_first_graph_search(problem)
+    return best_first_graph_search(problem, lambda node: node.path_cost)
 
 
 # ______________________________________________________________________________
