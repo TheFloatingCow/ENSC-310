@@ -121,18 +121,27 @@ class VacuumPlanning(Problem):
         Rotation of the Vacuum machine costs equivalent of 0.5 unit for each 90' rotation. """
         print("path_cost: to be done by students")
         
-        return curNode.path_cost
+        action_cost = 1
+        
+        #if rotation add 0.5
+        
+        return curNode.path_cost + action_cost
 
     def computeTurnCost(self, action1, action):
         print("computeTurnCost: to be done by students")
+        action_cost = 1
+        #if rotation add 0.5
         return 0
 
     def findMinManhattanDist(self, pos):
         """find the min distance between position pos and any of the dirty rooms. Dirty rooms are maintained in
         self.env.dirtyRooms."""
-        print("findMinManhattanDist: to be done by students. For now we return the distance to first dirty room.")
-        room = self.env.dirtyRooms[0]
-        return distance(pos, room)
+        #print("findMinManhattanDist: to be done by students. For now we return the distance to first dirty room.")
+        #room = self.env.dirtyRooms[0]
+        manhattanset = set()
+        for room in self.env.dirtyRooms:
+            manhattanset.add(abs(pos[0]-room[0]) + abs(pos[1]-room[1]))
+        return min(manhattanset)
         
     def h(self, node):
         """ Return the heuristic value for a given state. For this problem use minimum Manhattan 
