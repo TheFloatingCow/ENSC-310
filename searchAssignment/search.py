@@ -158,7 +158,7 @@ def breadth_first_graph_search(problem):
         for child in node.expand(problem):
             if tuple(child.state) not in explored and child not in frontier:
                 if problem.goal_test(child.state):
-                    return child, None
+                    return child, explored
                 frontier.append(child)
 
 
@@ -179,7 +179,7 @@ def depth_first_graph_search(problem):
             return None, None
         node = frontier.pop()
         if problem.goal_test(node.state):
-            return node, None
+            return node, explored
         explored.add(tuple(node.state))
         frontier.extend(child for child in node.expand(problem) if tuple(child.state) not in explored and child not in frontier)
 
@@ -203,7 +203,7 @@ def best_first_graph_search(problem, f=None):
             return None, None
         node = frontier.pop()
         if problem.goal_test(node.state):
-            return node, None
+            return node, explored
         explored.add(tuple(node.state))
         
         for child in node.expand(problem):
