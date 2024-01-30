@@ -141,11 +141,25 @@ def breadth_first_graph_search(problem):
     single line as below:
     return graph_search(problem, FIFOQueue())
     """
-    node = Node(problem.initial)  # FIFO queue
+    node = Node(problem.initial)
     if problem.goal_test(node.state):
-        return node, None
-    print("breadth_first_graph_search: to be done by students")
-    return None, None
+        return node
+
+    frontier = deque([node])  # FIFO queue
+    explored = set()
+    
+    while True:
+        if len(frontier) == 0:
+            return None, None
+        
+        node = frontier.popleft()
+        explored.add(tuple(node.state))
+        
+        for child in node.expand(problem):
+            if tuple(child.state) not in explored and child not in frontier:
+                if problem.goal_test(child.state):
+                    return child, None
+                frontier.append(child)
 
 
 def depth_first_graph_search(problem):
@@ -157,11 +171,17 @@ def depth_first_graph_search(problem):
     Does not get trapped by loops.
     If two paths reach a state, only use the first one.
     """
-    node = Node(problem.initial)  # FIFO queue
-    if problem.goal_test(node.state):
-        return node, None
-    print("depth_first_graph_search: to be done by students")
-    return None, None
+    frontier = []
+    frontier.append(Node(problem.initial))
+    explored = set()
+    while True:
+        if len(frontier) == 0:
+            return None, None
+        node = frontier.pop()
+        if problem.goal_test(node.state):
+            return node, None
+        explored.add(tuple(node.state))
+        frontier.extend(child for child in node.expand(problem) if tuple(child.state) not in explored and child not in frontier)
 
 
 def best_first_graph_search(problem, f=None):
@@ -171,16 +191,33 @@ def best_first_graph_search(problem, f=None):
     first search; if f is node.depth then we have breadth-first search.
     There is a subtlety: the line "f = memoize(f, 'f')" means that the f
     values will be cached on the nodes as they are computed. So after doing
-    a best first search you can examine the f values of the path returned."""
+    a best first search you can examine the f values of the path returned.
+    """
     f = memoize(f or problem.h, 'f')
     node = Node(problem.initial)
-    print("best_first_graph_search: to be done by students")
-    return None, None
+    frontier = PriorityQueue('min', f)
+    frontier.append(node)
+    explored = set()
+    while True:
+        if len(frontier) == 0:
+            return None, None
+        node = frontier.pop()
+        if problem.goal_test(node.state):
+            return node, None
+        explored.add(tuple(node.state))
+        
+        for child in node.expand(problem):
+            if tuple(child.state) not in explored and child not in frontier:
+                frontier.append(child)
+            elif child in frontier:
+                if f(child) < frontier[child]:
+                    del frontier[child]
+                    frontier.append(child)
 
 
 def uniform_cost_search(problem):
     """[Figure 3.14]"""
-    return best_first_graph_search(problem)
+    return best_first_graph_search(problem, lambda node: node.path_cost)
 
 
 # ______________________________________________________________________________

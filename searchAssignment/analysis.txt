@@ -1,2 +1,21 @@
 Analysis report
 
+1: How does the turn-cost affects the path and the explored area for each search.
+To better see the effects feel free to play with the turncost factor, which currently set at 0.5.
+
+Enabling turn-cost causes certain algorithms to minimize turns as much as possible.
+For example, when using UCS, if there is a dirty room 3 blocks away but each move required a turn, that would cost 4.5.
+However, if there was a room 4 blocks away in a straight line, even though it is farther, it only consts 4.
+So the robot would pick the one further away because it costs less.
+
+2: Imagine it is going to cost twice as much to climb up the vertical than moving horizontal.
+How would you go about incorporating this into current implementation,
+and where and which functions would be affected?
+How many different ways this goal can be achieved and what are the benefits and weaknesses of each solution.
+
+I would implement this in the path_cost function, where UP and DOWN actions cost twice as much as LEFT or RIGHT actions. This is very easy to do, but changing this would require changing the program itself.
+For example, in the normal case, LEFT and RIGHT cost 1 point therefore UP and DOWN would cost 2 points.
+This function would affect any algorithm that uses points/cost to calculate the best route.
+This includes best first search, uniform cost search, greedy best first search, and A* search because they all use the cost of action in their algorithms.
+You could also implement this in the turnCost function, which is good for modularity in the program. The weakness is that this increases the number of functions in the program.
+You can also use a configuration parameter which would allow you to adjust the code easily. The weakness to this is that you are adding another parameter to keep track of.
