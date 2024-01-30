@@ -119,25 +119,33 @@ class VacuumPlanning(Problem):
         """To be used for UCS and A* search. Returns the cost of a solution path that arrives at state2 from
         state1 via action, assuming it costs c to get up to state1. For our problem state is (x, y) coordinate pair. 
         Rotation of the Vacuum machine costs equivalent of 0.5 unit for each 90' rotation. """
-        print("path_cost: to be done by students")
         
         action_cost = 1
         
-        #if rotation add 0.5
-        
+        if self.turnCostOn: # If TurnCost button is pressed, turning costs 0.5
+            if curNode.action != action and curNode.depth > 0:
+                if (curNode.action == "UP" and action == "DOWN") or (curNode.action == "DOWN" and action == "UP") or (curNode.action == "LEFT" and action == "RIGHT") or (curNode.action == "RIGHT" and action == "LEFT"):
+                    action_cost += 1
+                else:
+                    action_cost += 0.5
         return curNode.path_cost + action_cost
 
     def computeTurnCost(self, action1, action):
-        print("computeTurnCost: to be done by students")
+        
         action_cost = 1
-        #if rotation add 0.5
-        return 0
+        
+        if self.turnCostOn:
+            if action1 != action:
+                if (action1 == "UP" and action == "DOWN") or (action1 == "DOWN" and action == "UP") or (action1 == "LEFT" and action == "RIGHT") or (action1 == "RIGHT" and action == "LEFT"):
+                    action_cost += 1
+                else:
+                    action_cost += 0.5
+                
+        return action_cost
 
     def findMinManhattanDist(self, pos):
         """find the min distance between position pos and any of the dirty rooms. Dirty rooms are maintained in
         self.env.dirtyRooms."""
-        #print("findMinManhattanDist: to be done by students. For now we return the distance to first dirty room.")
-        #room = self.env.dirtyRooms[0]
         manhattanset = set()
         for room in self.env.dirtyRooms:
             manhattanset.add(abs(pos[0]-room[0]) + abs(pos[1]-room[1]))
