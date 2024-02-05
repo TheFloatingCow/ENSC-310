@@ -173,3 +173,4 @@ cython_debug/
 *.vsix
 
 searchAssignment/__pycache__/search.cpython-312.pyc
+searchAssignment/__pycache__/search.cpython-311.pyc
