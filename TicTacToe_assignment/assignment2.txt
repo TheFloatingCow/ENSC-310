@@ -32,3 +32,7 @@ Rubric for Grading:
 10% (includes 5% bonus) if game not be winable by X player in one of the play modes.
 
 
+PLAN (in order)
+k_in_row
+evaluation_func
+other things
