@@ -64,52 +64,49 @@ def minmax_cutoff(game, state, depth):
     forward all the way to the cutoff depth. At that level use evaluation func."""
     
     print("Running minmax_cutoff at depth " + str(depth))
-    
+        
     """
-    
     player = game.to_move(state)
-    
     if depth == 0 or game.terminal_test(state):
         return score
     children = game.actions(state)
     if player == 'O': # computer
         bestScore = -np.inf
         for a in children:
-            score = minmax_cutoff(game, state, depth - 1)
+            score = minmax_cutoff(game, game.result_cutoff(state, a), depth - 1)
             if score > bestScore:
                 bestScore = score
         return bestScore
     elif player == 'X': # player
         bestScore = np.inf
         for a in children:
-            score = minmax_cutoff(game, state, depth - 1)
+            score = minmax_cutoff(game, game.result_cutoff(state, a), depth - 1)
             if score < bestScore:
                 bestScore = score
             return bestScore
     """
-    #game.evaluation_func(state);
-    
-    player = game.to_move(state)
 
     def max_value(state, depth):
+        print("Running max_value")
         if depth == 0 or game.terminal_test(state):
-            return game.utility(state, player)
+            return game.evaluation_func(state)
         v = -np.inf
         for a in game.actions(state):
-            v = max(v, min_value(game.result_cutoff(state, a), depth - 1))
+            v = max(v, min_value(game.result(state, a), depth - 1))
         return v
 
     def min_value(state, depth):
+        print("Running min_value")
         if depth == 0 or game.terminal_test(state):
-            return game.utility(state, player)
+            return game.evaulation_func(state)
         v = np.inf
         for a in game.actions(state):
-            v = min(v, max_value(game.result_cutoff(state, a), depth - 1))
+            v = min(v, max_value(game.result(state, a), depth - 1))
         return v
 
     print("minmax_cutoff: to be done by studens")
     # Body of minmax_decision:
-    return max(game.actions(state), key=lambda a: min_value(game.result_cutoff(state, a), depth))
+    return max(game.actions(state), key=lambda a: min_value(game.result(state, a), depth))
 
 # ______________________________________________________________________________
 
@@ -387,6 +384,8 @@ class TicTacToe(Game):
         """Return true if there is a line through move on board for player.
         hint: This function can be extended to test of n number of items on a line 
         not just self.k items as it is now. """
+        # number is the number in a row it is checking for
+        # EX: if number is 2, check for 2 in a row and return true if found
         (delta_x, delta_y) = delta_x_y
         x, y = move
         n = 0  # n is number of moves in row
