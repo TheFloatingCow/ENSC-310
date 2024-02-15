@@ -141,7 +141,10 @@ def expect_minmax_cutoff(game, state):
         sum_chances = 0
         num_chances = len(game.chances(res_state))
         print("chance_node: to be completed by students")
-        return 0 
+        
+        for chance, next_state in game.chances(res_state):
+            sum_chances += chance * min_value(next_state) if player == game.to_move(next_state) else chance * max_value(next_state)
+        return sum_chances
 
     # Body of expect_minmax:
     return max(game.actions(state), key=lambda a: chance_node(state, a), default=None)
@@ -449,7 +452,13 @@ class TicTacToe(Game):
     def chances(self, state):
         """Return a list of all possible states."""
         print("To be completed by students")
+        if self.terminal_test(state):
+            return []
+        #DOESNT WORK AT ALL
         chances = []
+        for action in self.actions(state):
+            for chance, next_state in self.result_cutoff(state, action):
+                chances.append((chance, next_state))
         return chances
 
 
