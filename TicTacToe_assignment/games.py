@@ -62,29 +62,52 @@ def minmax_cutoff(game, state, depth):
     forward all the way to the cutoff depth. At that level use evaluation func."""
     
     print("Running minmax_cutoff at depth " + str(depth))
+    
+    """
+    
+    player = game.to_move(state)
+    
+    if depth == 0 or game.terminal_test(state):
+        return score
+    children = game.actions(state)
+    if player == 'O': # computer
+        bestScore = -np.inf
+        for a in children:
+            score = minmax_cutoff(game, state, depth - 1)
+            if score > bestScore:
+                bestScore = score
+        return bestScore
+    elif player == 'X': # player
+        bestScore = np.inf
+        for a in children:
+            score = minmax_cutoff(game, state, depth - 1)
+            if score < bestScore:
+                bestScore = score
+            return bestScore
+    """
     #game.evaluation_func(state);
     
-    #player = game.to_move(state)
+    player = game.to_move(state)
 
-    def max_value(state):
+    def max_value(state, depth):
         if depth == 0 or game.terminal_test(state):
-            return game.evaluation_func(state)
+            return game.utility(state, player)
         v = -np.inf
         for a in game.actions(state):
-            v = max(v, min_value(game.result(state, a)))
+            v = max(v, min_value(game.result_cutoff(state, a), depth - 1))
         return v
 
-    def min_value(state):
+    def min_value(state, depth):
         if depth == 0 or game.terminal_test(state):
-            return game.evaluation_func(state)
+            return game.utility(state, player)
         v = np.inf
         for a in game.actions(state):
-            v = min(v, max_value(game.result(state, a)))
+            v = min(v, max_value(game.result_cutoff(state, a), depth - 1))
         return v
 
     print("minmax_cutoff: to be done by studens")
     # Body of minmax_decision:
-    return max(game.actions(state), key=lambda a: min_value(game.result(state, a), depth - 1))
+    return max(game.actions(state), key=lambda a: min_value(game.result_cutoff(state, a), depth))
 
 # ______________________________________________________________________________
 
@@ -281,6 +304,17 @@ class TicTacToe(Game):
         return GameState(to_move=('O' if state.to_move == 'X' else 'X'),
                          utility=self.compute_utility(board, move, state.to_move),
                          board=board, moves=moves)
+        
+    def result_cutoff(self, state, move): # result function but using evaluation instead of utility
+        if move not in state.moves:
+            return state  # Illegal move has no effect
+        board = state.board.copy()
+        board[move] = state.to_move
+        moves = list(state.moves)
+        moves.remove(move)
+        return GameState(to_move=('O' if state.to_move == 'X' else 'X'),
+                         utility=self.evaluation_func(state, move),
+                         board=board, moves=moves)
 
     def utility(self, state, player):
         """Return the value to player; 1 for win, -1 for loss, 0 otherwise."""
@@ -298,6 +332,7 @@ class TicTacToe(Game):
             print()
 
     def compute_utility(self, board, move, player):
+        print("Running compute_utility")
         """If 'X' wins with this move, return 1; if 'O' wins return -1; else return 0."""
         if (self.k_in_row(board, move, player, (0, 1), 3) or
                 self.k_in_row(board, move, player, (1, 0), 3) or
@@ -307,7 +342,7 @@ class TicTacToe(Game):
         else:
             return 0
 
-    def evaluation_func(self, state):
+    def evaluation_func(self, state, move):
         """computes value for a player on board after move.
             Likely it is better to conside the board's state from 
             the point of view of both 'X' and 'O' players and then subtract
@@ -316,26 +351,33 @@ class TicTacToe(Game):
         -100, -10, -1 for 3, 2, 1 in a line for opponent"""
         """Start with 1, each increase in number increases points by x10. All they way to k"""
         
+        
+        print("Running evaluation_func")
         score = 0;
-        print(list(state.board.keys())[0])
         # start with X (player)
         # negative points
+        # list(state.board.keys())[0]
         for index in range(self.k):
-            if (self.k_in_row(state.board, list(state.board.keys())[0], 'X', (0, 1), index + 1) or
-                self.k_in_row(state.board, list(state.board.keys())[0], 'X', (1, 0), index + 1) or
-                self.k_in_row(state.board, list(state.board.keys())[0], 'X', (1, -1), index + 1) or
-                self.k_in_row(state.board, list(state.board.keys())[0], 'X', (1, 1)), index + 1):
+            if (self.k_in_row(state.board, move, 'X', (0, 1), index + 1) or
+                self.k_in_row(state.board, move, 'X', (1, 0), index + 1) or
+                self.k_in_row(state.board, move, 'X', (1, -1), index + 1) or
+                self.k_in_row(state.board, move, 'X', (1, 1)), index + 1):
+                print("Found one for number " + str(index + 1) + " for player X")
                 score -= 10 ** index;
             
         # then do O (computer)
         # positive points
         for index in range(self.k):
-            if (self.k_in_row(state.board, list(state.board.keys())[0], 'O', (0, 1), index + 1) or
-                self.k_in_row(state.board, list(state.board.keys())[0], 'O', (1, 0), index + 1) or
-                self.k_in_row(state.board, list(state.board.keys())[0], 'O', (1, -1), index + 1) or
-                self.k_in_row(state.board, list(state.board.keys())[0], 'O', (1, 1)), index + 1):
+            if (self.k_in_row(state.board, move, 'O', (0, 1), index + 1) or
+                self.k_in_row(state.board, move, 'O', (1, 0), index + 1) or
+                self.k_in_row(state.board, move, 'O', (1, -1), index + 1) or
+                self.k_in_row(state.board, move, 'O', (1, 1)), index + 1):
+                print("Found one for number " + str(index + 1) + " for player O")
                 score += 10 ** index;
                 
+        if self.to_move == 'X': # if it is players turn, score should be inverse of computer
+            score = -score;
+        
         print("Score is " + str(score))
         print("evaluation_function: to be completed by students")
         return score;

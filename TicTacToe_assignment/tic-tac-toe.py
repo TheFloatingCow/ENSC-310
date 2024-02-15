@@ -153,9 +153,10 @@ def on_click(button):
         board[move] = sym
         button_to_change.config(text=sym, state='disabled', disabledforeground="black")
 
-        if gBoard.compute_utility(board, move, sym) == -1:
+        if gBoard.compute_utility(board, move, sym) < 0:
             result.set("You lose :(")
             disable_game()
+            return
 
     result.set("Your Turn!")
 
