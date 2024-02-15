@@ -57,12 +57,34 @@ def minmax(game, state):
     return max(game.actions(state), key=lambda a: min_value(game.result(state, a)))
 
 
-def minmax_cutoff(game, state):
+def minmax_cutoff(game, state, depth):
     """Given a state in a game, calculate the best move by searching
     forward all the way to the cutoff depth. At that level use evaluation func."""
+    
+    print("Running minmax_cutoff at depth " + str(depth))
+    #game.evaluation_func(state);
+    
+    #player = game.to_move(state)
+
+    def max_value(state):
+        if depth == 0 or game.terminal_test(state):
+            return game.evaluation_func(state)
+        v = -np.inf
+        for a in game.actions(state):
+            v = max(v, min_value(game.result(state, a)))
+        return v
+
+    def min_value(state):
+        if depth == 0 or game.terminal_test(state):
+            return game.evaluation_func(state)
+        v = np.inf
+        for a in game.actions(state):
+            v = min(v, max_value(game.result(state, a)))
+        return v
 
     print("minmax_cutoff: to be done by studens")
-    return None
+    # Body of minmax_decision:
+    return max(game.actions(state), key=lambda a: min_value(game.result(state, a), depth - 1))
 
 # ______________________________________________________________________________
 
@@ -169,7 +191,7 @@ def alpha_beta_player(game, state):
 def minmax_player(game,state):
     if( game.d == -1):
         return minmax(game, state)
-    return minmax_cutoff(game, state)
+    return minmax_cutoff(game, state, game.d)
 
 
 def expect_minmax_player(game, state):
@@ -277,10 +299,10 @@ class TicTacToe(Game):
 
     def compute_utility(self, board, move, player):
         """If 'X' wins with this move, return 1; if 'O' wins return -1; else return 0."""
-        if (self.k_in_row(board, move, player, (0, 1)) or
-                self.k_in_row(board, move, player, (1, 0)) or
-                self.k_in_row(board, move, player, (1, -1)) or
-                self.k_in_row(board, move, player, (1, 1))):
+        if (self.k_in_row(board, move, player, (0, 1), 3) or
+                self.k_in_row(board, move, player, (1, 0), 3) or
+                self.k_in_row(board, move, player, (1, -1), 3) or
+                self.k_in_row(board, move, player, (1, 1), 3)):
             return self.k if player == 'X' else -self.k
         else:
             return 0
@@ -290,14 +312,40 @@ class TicTacToe(Game):
             Likely it is better to conside the board's state from 
             the point of view of both 'X' and 'O' players and then subtract
             the corresponding values before returning."""
+        """+100, +10, +1 for 3, 2, 1 in a line for computer
+        -100, -10, -1 for 3, 2, 1 in a line for opponent"""
+        """Start with 1, each increase in number increases points by x10. All they way to k"""
+        
+        score = 0;
+        print(list(state.board.keys())[0])
+        # start with X (player)
+        # negative points
+        for index in range(self.k):
+            if (self.k_in_row(state.board, list(state.board.keys())[0], 'X', (0, 1), index + 1) or
+                self.k_in_row(state.board, list(state.board.keys())[0], 'X', (1, 0), index + 1) or
+                self.k_in_row(state.board, list(state.board.keys())[0], 'X', (1, -1), index + 1) or
+                self.k_in_row(state.board, list(state.board.keys())[0], 'X', (1, 1)), index + 1):
+                score -= 10 ** index;
+            
+        # then do O (computer)
+        # positive points
+        for index in range(self.k):
+            if (self.k_in_row(state.board, list(state.board.keys())[0], 'O', (0, 1), index + 1) or
+                self.k_in_row(state.board, list(state.board.keys())[0], 'O', (1, 0), index + 1) or
+                self.k_in_row(state.board, list(state.board.keys())[0], 'O', (1, -1), index + 1) or
+                self.k_in_row(state.board, list(state.board.keys())[0], 'O', (1, 1)), index + 1):
+                score += 10 ** index;
                 
+        print("Score is " + str(score))
         print("evaluation_function: to be completed by students")
-        pass
+        return score;
 		
-    def k_in_row(self, board, move, player, delta_x_y):
+    def k_in_row(self, board, move, player, delta_x_y, number):
         """Return true if there is a line through move on board for player.
         hint: This function can be extended to test of n number of items on a line 
         not just self.k items as it is now. """
+        # number is the number in a row it is checking for
+        # EX: if number is 2, check for 2 in a row and return true if found
         (delta_x, delta_y) = delta_x_y
         x, y = move
         n = 0  # n is number of moves in row
@@ -309,7 +357,14 @@ class TicTacToe(Game):
             n += 1
             x, y = x - delta_x, y - delta_y
         n -= 1  # Because we counted move itself twice
-        return n >= self.k
+        print("n is " + str(n) + ", k is " + str(self.k) + ", number is " + str(number) + ", player is " + player)
+        return n >= number;
+        #return n >= self.k
+        
+    def chances(self, state):
+        """Return a list of all possible states."""
+        chances = []
+        return chances
 
 
 class Gomoku(TicTacToe):

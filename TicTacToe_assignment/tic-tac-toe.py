@@ -22,7 +22,7 @@ gheight = 4
 gwidth = 4
 gkmatch = 4
 gdepth = -1 # -1 means search cutoff depth set to leaf level.
-
+# cutoff depth set to: 
 
 
 def create_frames(root):
