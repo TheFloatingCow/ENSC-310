@@ -34,6 +34,8 @@ def gen_state(to_move='X', x_positions=[], o_positions=[], h=3, v=3):
 def minmax(game, state):
     """Given a state in a game, calculate the best move by searching
     forward all the way to the terminal states. [Figure 5.3]"""
+    
+    print("running minmax")
 
     player = game.to_move(state)
 
@@ -332,7 +334,6 @@ class TicTacToe(Game):
             print()
 
     def compute_utility(self, board, move, player):
-        print("Running compute_utility")
         """If 'X' wins with this move, return 1; if 'O' wins return -1; else return 0."""
         if (self.k_in_row(board, move, player, (0, 1), 3) or
                 self.k_in_row(board, move, player, (1, 0), 3) or
@@ -386,8 +387,6 @@ class TicTacToe(Game):
         """Return true if there is a line through move on board for player.
         hint: This function can be extended to test of n number of items on a line 
         not just self.k items as it is now. """
-        # number is the number in a row it is checking for
-        # EX: if number is 2, check for 2 in a row and return true if found
         (delta_x, delta_y) = delta_x_y
         x, y = move
         n = 0  # n is number of moves in row
@@ -399,7 +398,7 @@ class TicTacToe(Game):
             n += 1
             x, y = x - delta_x, y - delta_y
         n -= 1  # Because we counted move itself twice
-        print("n is " + str(n) + ", k is " + str(self.k) + ", number is " + str(number) + ", player is " + player)
+        print("n is " + str(n))
         return n >= number;
         #return n >= self.k
         
