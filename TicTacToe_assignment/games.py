@@ -398,7 +398,6 @@ class TicTacToe(Game):
             n += 1
             x, y = x - delta_x, y - delta_y
         n -= 1  # Because we counted move itself twice
-        print("n is " + str(n))
         return n >= number;
         #return n >= self.k
         
