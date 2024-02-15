@@ -79,7 +79,7 @@ def minmax_cutoff(game, state):
             v = min(v, max_value(game.result_cutoff(state, a), depth - 1))
         return v
 
-    #print("minmax_cutoff: to be done by studens")
+    #print("minmax_cutoff: to be done by students")
     # Body of minmax_decision:
     return max(game.actions(state), key=lambda a: min_value(game.result(state, a), depth))
 
@@ -117,6 +117,35 @@ def expect_minmax(game, state):
 
     # Body of expect_minmax:
     return max(game.actions(state), key=lambda a: chance_node(state, a), default=None)
+
+def expect_minmax_cutoff(game, state):
+    
+    player = game.to_move(state)
+
+    def max_value(state):
+        v = -np.inf
+        for a in game.actions(state):
+            v = max(v, chance_node(state, a))
+        return v
+
+    def min_value(state):
+        v = np.inf
+        for a in game.actions(state):
+            v = min(v, chance_node(state, a))
+        return v
+
+    def chance_node(state, action):
+        res_state = game.result(state, action)
+        if game.terminal_test(res_state):
+            return game.utility(res_state, player)
+        sum_chances = 0
+        num_chances = len(game.chances(res_state))
+        print("chance_node: to be completed by students")
+        return 0 
+
+    # Body of expect_minmax:
+    return max(game.actions(state), key=lambda a: chance_node(state, a), default=None)
+
 
 
 def alpha_beta_search(game, state):
@@ -161,8 +190,6 @@ def alpha_beta_cutoff_search(game, state, d=4, cutoff_test=None, eval_fn=None):
     """Search game to determine best action; use alpha-beta pruning.
     This version cuts off search and uses an evaluation function."""
     #print("alpha_beta_cutoff_search: may be used, if so, must be implemented by students")
-    
-    player = game.to_move(state)
     
     depth = game.d
 
@@ -224,7 +251,9 @@ def random_player(game, state):
 
 
 def alpha_beta_player(game, state):
-    return alpha_beta_search(game, state)
+    if (game.d == -1):
+        return alpha_beta_search(game, state)
+    return alpha_beta_cutoff_search(game, state)
 
 
 def minmax_player(game,state):
@@ -234,7 +263,9 @@ def minmax_player(game,state):
 
 
 def expect_minmax_player(game, state):
-    return expect_minmax(game, state)
+    if (game.d == -1):
+        return expect_minmax(game, state)
+    return expect_minmax_cutoff(game, state)
 
 
 # ______________________________________________________________________________
@@ -353,7 +384,7 @@ class TicTacToe(Game):
                 self.k_in_row(board, move, player, (1, 0), self.k) or
                 self.k_in_row(board, move, player, (1, -1), self.k) or
                 self.k_in_row(board, move, player, (1, 1), self.k)):
-            return self.k if player == 'X' else -self.k
+            return 1 if player == 'X' else -1
         else:
             return 0
 
@@ -417,6 +448,7 @@ class TicTacToe(Game):
         
     def chances(self, state):
         """Return a list of all possible states."""
+        print("To be completed by students")
         chances = []
         return chances
 
