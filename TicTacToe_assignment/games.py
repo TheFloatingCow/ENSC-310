@@ -349,10 +349,10 @@ class TicTacToe(Game):
 
     def compute_utility(self, board, move, player):
         """If 'X' wins with this move, return 1; if 'O' wins return -1; else return 0."""
-        if (self.k_in_row(board, move, player, (0, 1), 3) or
-                self.k_in_row(board, move, player, (1, 0), 3) or
-                self.k_in_row(board, move, player, (1, -1), 3) or
-                self.k_in_row(board, move, player, (1, 1), 3)):
+        if (self.k_in_row(board, move, player, (0, 1), self.k) or
+                self.k_in_row(board, move, player, (1, 0), self.k) or
+                self.k_in_row(board, move, player, (1, -1), self.k) or
+                self.k_in_row(board, move, player, (1, 1), self.k)):
             return self.k if player == 'X' else -self.k
         else:
             return 0
