@@ -87,21 +87,21 @@ def minmax_cutoff(game, state, depth):
     """
 
     def max_value(state, depth):
-        print("Running max_value")
+        print("Running max_value at depth " + str(depth))
         if depth == 0 or game.terminal_test(state):
             return game.evaluation_func(state)
         v = -np.inf
         for a in game.actions(state):
-            v = max(v, min_value(game.result(state, a), depth - 1))
+            v = max(v, min_value(game.result_cutoff(state, a), depth - 1))
         return v
 
     def min_value(state, depth):
-        print("Running min_value")
+        print("Running min_value at depth " + str(depth))
         if depth == 0 or game.terminal_test(state):
-            return game.evaulation_func(state)
+            return game.evaluation_func(state)
         v = np.inf
         for a in game.actions(state):
-            v = min(v, max_value(game.result(state, a), depth - 1))
+            v = min(v, max_value(game.result_cutoff(state, a), depth - 1))
         return v
 
     print("minmax_cutoff: to be done by studens")
@@ -155,19 +155,30 @@ def alpha_beta_search(game, state):
         if game.terminal_test(state):
             return game.utility(state, player)
         v = -np.inf
-        print("alpha_beta_search: max_value: to be completed by student")
+        for a in game.actions(state):
+            v = max(v, min_value(game.result(state, a), alpha, beta))
+            if v >= beta:
+                return v
+            alpha = max(alpha, v)
+        #print("alpha_beta_search: max_value: to be completed by student")
         return v
 
     def min_value(state, alpha, beta):
         if game.terminal_test(state):
             return game.utility(state, player)
         v = np.inf
-        print("alpha_beta_search: min_value: to be completed by student")
+        for a in game.actions(state):
+            v = min(v, max_value(game.result(state, a), alpha, beta))
+            if v <= alpha:
+                return v
+            beta = min(beta, v)
+        #print("alpha_beta_search: min_value: to be completed by student")
         return v
 
     # Body of alpha_beta_search:
-    best_action = None
-    print("alpha_beta_search: to be completed by students")
+    #v = max_value(state, -np.inf, np.inf)
+    best_action = max(game.actions(state), key=lambda a: max_value(state, -np.inf, np.inf))
+    #print("alpha_beta_search: to be completed by students")
     return best_action
 
 
@@ -340,7 +351,7 @@ class TicTacToe(Game):
         else:
             return 0
 
-    def evaluation_func(self, state, move):
+    def evaluation_func(self, state):
         """computes value for a player on board after move.
             Likely it is better to conside the board's state from 
             the point of view of both 'X' and 'O' players and then subtract
@@ -356,20 +367,20 @@ class TicTacToe(Game):
         # negative points
         # list(state.board.keys())[0]
         for index in range(self.k):
-            if (self.k_in_row(state.board, move, 'X', (0, 1), index + 1) or
-                self.k_in_row(state.board, move, 'X', (1, 0), index + 1) or
-                self.k_in_row(state.board, move, 'X', (1, -1), index + 1) or
-                self.k_in_row(state.board, move, 'X', (1, 1)), index + 1):
+            if (self.k_in_row(state.board, list(state.board.keys())[0], 'X', (0, 1), index + 1) or
+                self.k_in_row(state.board, list(state.board.keys())[0], 'X', (1, 0), index + 1) or
+                self.k_in_row(state.board, list(state.board.keys())[0], 'X', (1, -1), index + 1) or
+                self.k_in_row(state.board, list(state.board.keys())[0], 'X', (1, 1)), index + 1):
                 print("Found one for number " + str(index + 1) + " for player X")
                 score -= 10 ** index;
             
         # then do O (computer)
         # positive points
         for index in range(self.k):
-            if (self.k_in_row(state.board, move, 'O', (0, 1), index + 1) or
-                self.k_in_row(state.board, move, 'O', (1, 0), index + 1) or
-                self.k_in_row(state.board, move, 'O', (1, -1), index + 1) or
-                self.k_in_row(state.board, move, 'O', (1, 1)), index + 1):
+            if (self.k_in_row(state.board, list(state.board.keys())[0], 'O', (0, 1), index + 1) or
+                self.k_in_row(state.board, list(state.board.keys())[0], 'O', (1, 0), index + 1) or
+                self.k_in_row(state.board, list(state.board.keys())[0], 'O', (1, -1), index + 1) or
+                self.k_in_row(state.board, list(state.board.keys())[0], 'O', (1, 1)), index + 1):
                 print("Found one for number " + str(index + 1) + " for player O")
                 score += 10 ** index;
                 
