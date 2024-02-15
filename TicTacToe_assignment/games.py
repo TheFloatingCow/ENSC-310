@@ -113,7 +113,10 @@ def expect_minmax(game, state):
         sum_chances = 0
         num_chances = len(game.chances(res_state))
         print("chance_node: to be completed by students")
-        return 0 
+        
+        for chance, next_state in game.chances(res_state):
+            sum_chances += chance * min_value(next_state) if player == game.to_move(next_state) else chance * max_value(next_state)
+        return sum_chances
 
     # Body of expect_minmax:
     return max(game.actions(state), key=lambda a: chance_node(state, a), default=None)
