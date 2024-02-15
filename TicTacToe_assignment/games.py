@@ -34,8 +34,6 @@ def gen_state(to_move='X', x_positions=[], o_positions=[], h=3, v=3):
 def minmax(game, state):
     """Given a state in a game, calculate the best move by searching
     forward all the way to the terminal states. [Figure 5.3]"""
-    
-    print("running minmax")
 
     player = game.to_move(state)
 
@@ -59,35 +57,13 @@ def minmax(game, state):
     return max(game.actions(state), key=lambda a: min_value(game.result(state, a)))
 
 
-def minmax_cutoff(game, state, depth):
+def minmax_cutoff(game, state):
     """Given a state in a game, calculate the best move by searching
     forward all the way to the cutoff depth. At that level use evaluation func."""
     
-    print("Running minmax_cutoff at depth " + str(depth))
-        
-    """
-    player = game.to_move(state)
-    if depth == 0 or game.terminal_test(state):
-        return score
-    children = game.actions(state)
-    if player == 'O': # computer
-        bestScore = -np.inf
-        for a in children:
-            score = minmax_cutoff(game, game.result_cutoff(state, a), depth - 1)
-            if score > bestScore:
-                bestScore = score
-        return bestScore
-    elif player == 'X': # player
-        bestScore = np.inf
-        for a in children:
-            score = minmax_cutoff(game, game.result_cutoff(state, a), depth - 1)
-            if score < bestScore:
-                bestScore = score
-            return bestScore
-    """
+    depth = game.d
 
     def max_value(state, depth):
-        print("Running max_value at depth " + str(depth))
         if depth == 0 or game.terminal_test(state):
             return game.evaluation_func(state)
         v = -np.inf
@@ -96,7 +72,6 @@ def minmax_cutoff(game, state, depth):
         return v
 
     def min_value(state, depth):
-        print("Running min_value at depth " + str(depth))
         if depth == 0 or game.terminal_test(state):
             return game.evaluation_func(state)
         v = np.inf
@@ -104,7 +79,7 @@ def minmax_cutoff(game, state, depth):
             v = min(v, max_value(game.result_cutoff(state, a), depth - 1))
         return v
 
-    print("minmax_cutoff: to be done by studens")
+    #print("minmax_cutoff: to be done by studens")
     # Body of minmax_decision:
     return max(game.actions(state), key=lambda a: min_value(game.result(state, a), depth))
 
@@ -185,9 +160,40 @@ def alpha_beta_search(game, state):
 def alpha_beta_cutoff_search(game, state, d=4, cutoff_test=None, eval_fn=None):
     """Search game to determine best action; use alpha-beta pruning.
     This version cuts off search and uses an evaluation function."""
-    print("alpha_beta_cutoff_search: may be used, if so, must be implemented by students")
+    #print("alpha_beta_cutoff_search: may be used, if so, must be implemented by students")
     
-    return None
+    player = game.to_move(state)
+    
+    depth = game.d
+
+    # Functions used by alpha_beta
+    def max_value(state, alpha, beta, depth):
+        if game.terminal_test(state):
+            return game.evaluation_func(state)
+        v = -np.inf
+        for a in game.actions(state):
+            v = max(v, min_value(game.result_cutoff(state, a), alpha, beta, depth - 1))
+            if v >= beta:
+                return v
+            alpha = max(alpha, v)
+        return v
+
+    def min_value(state, alpha, beta, depth):
+        if game.terminal_test(state):
+            return game.evaluation_func(state)
+        v = np.inf
+        for a in game.actions(state):
+            v = min(v, max_value(game.result_cutoff(state, a), alpha, beta, depth - 1))
+            if v <= alpha:
+                return v
+            beta = min(beta, v)
+        return v
+
+    # Body of alpha_beta_search:
+    #v = max_value(state, -np.inf, np.inf)
+    best_action = max(game.actions(state), key=lambda a: max_value(state, -np.inf, np.inf, depth))
+    #print("alpha_beta_search: to be completed by students")
+    return best_action
 
 
 # ______________________________________________________________________________
@@ -224,7 +230,7 @@ def alpha_beta_player(game, state):
 def minmax_player(game,state):
     if( game.d == -1):
         return minmax(game, state)
-    return minmax_cutoff(game, state, game.d)
+    return minmax_cutoff(game, state)
 
 
 def expect_minmax_player(game, state):
@@ -323,7 +329,7 @@ class TicTacToe(Game):
         moves = list(state.moves)
         moves.remove(move)
         return GameState(to_move=('O' if state.to_move == 'X' else 'X'),
-                         utility=self.evaluation_func(state, move),
+                         utility=self.evaluation_func(state),
                          board=board, moves=moves)
 
     def utility(self, state, player):
@@ -360,8 +366,6 @@ class TicTacToe(Game):
         -100, -10, -1 for 3, 2, 1 in a line for opponent"""
         """Start with 1, each increase in number increases points by x10. All they way to k"""
         
-        
-        print("Running evaluation_func")
         score = 0;
         # start with X (player)
         # negative points
@@ -370,7 +374,7 @@ class TicTacToe(Game):
             if (self.k_in_row(state.board, list(state.board.keys())[0], 'X', (0, 1), index + 1) or
                 self.k_in_row(state.board, list(state.board.keys())[0], 'X', (1, 0), index + 1) or
                 self.k_in_row(state.board, list(state.board.keys())[0], 'X', (1, -1), index + 1) or
-                self.k_in_row(state.board, list(state.board.keys())[0], 'X', (1, 1)), index + 1):
+                self.k_in_row(state.board, list(state.board.keys())[0], 'X', (1, 1), index + 1)):
                 print("Found one for number " + str(index + 1) + " for player X")
                 score -= 10 ** index;
             
@@ -380,7 +384,7 @@ class TicTacToe(Game):
             if (self.k_in_row(state.board, list(state.board.keys())[0], 'O', (0, 1), index + 1) or
                 self.k_in_row(state.board, list(state.board.keys())[0], 'O', (1, 0), index + 1) or
                 self.k_in_row(state.board, list(state.board.keys())[0], 'O', (1, -1), index + 1) or
-                self.k_in_row(state.board, list(state.board.keys())[0], 'O', (1, 1)), index + 1):
+                self.k_in_row(state.board, list(state.board.keys())[0], 'O', (1, 1), index + 1)):
                 print("Found one for number " + str(index + 1) + " for player O")
                 score += 10 ** index;
                 
@@ -388,7 +392,7 @@ class TicTacToe(Game):
             score = -score;
         
         print("Score is " + str(score))
-        print("evaluation_function: to be completed by students")
+        #print("evaluation_function: to be completed by students")
         return score;
 		
     def k_in_row(self, board, move, player, delta_x_y, number):
