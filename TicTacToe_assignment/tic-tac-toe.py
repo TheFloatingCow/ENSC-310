@@ -281,7 +281,7 @@ if __name__ == "__main__":
         gwidth =  int(sys.argv[2])
         gkmatch = int(sys.argv[3])
     else:
-        gheight = gwidth = gkmatch = 3
+        gheight = gwidth = gkmatch = 3 # Size of game board
 
     root = Tk()
     root.title("TicTacToe")

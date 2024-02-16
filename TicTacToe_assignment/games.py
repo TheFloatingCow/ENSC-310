@@ -390,7 +390,7 @@ class TicTacToe(Game):
                 self.k_in_row(board, move, player, (1, 0), self.k) or
                 self.k_in_row(board, move, player, (1, -1), self.k) or
                 self.k_in_row(board, move, player, (1, 1), self.k)):
-            return 1 if player == 'X' else -1
+            return self.k if player == 'X' else -self.k
         else:
             return 0
 
