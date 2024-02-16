@@ -22,7 +22,7 @@ gheight = 4
 gwidth = 4
 gkmatch = 4
 gdepth = -1 # -1 means search cutoff depth set to leaf level.
-# cutoff depth set to: 
+
 
 
 def create_frames(root):
@@ -124,16 +124,23 @@ def on_click(button):
     Tk.update(root)
     time.sleep(0.7)
  
+    if count % 2 == 0:  # Used again, will become handy when user is given the choice of turn.
+        sym = "X"
+    else:
+        sym = "O"
+    count += 1
+    state2 = gen_state(to_move=sym, x_positions=x_pos, o_positions=o_pos, h=gBoard.k, v=gBoard.k)
+
     try:
         choice = choices.get()
         if "Random" in choice:
-            a, b = random_player(gBoard, state1)
+            a, b = random_player(gBoard, state2)
         elif "Expectimax" in choice:
-            a, b = expect_minmax(gBoard, state1)
+            a, b = expect_minmax(gBoard, state2)
         elif "MinMax" in choice:
-            a, b = minmax_player(gBoard, state1)
+            a, b = minmax_player(gBoard, state2)
         else:
-            a, b = alpha_beta_player(gBoard, state1)
+            a, b = alpha_beta_player(gBoard, state2)
     except (ValueError, IndexError, TypeError) as e:
         disable_game()
         result.set("It's a draw :|")
@@ -141,24 +148,17 @@ def on_click(button):
     if 1 <= a <= gwidth and 1 <= b <= gheight:
         o_pos.append((a, b))
         button_to_change = get_button(a - 1, b - 1)
-        if count % 2 == 0:  # Used again, will become handy when user is given the choice of turn.
-            sym = "X"
-        else:
-            sym = "O"
-        count += 1
-        state2 = gen_state(to_move=sym, x_positions=x_pos, o_positions=o_pos, h=gBoard.k, v=gBoard.k)
 
         board = state2.board.copy()
         move = (a, b)
         board[move] = sym
         button_to_change.config(text=sym, state='disabled', disabledforeground="black")
 
-        if gBoard.compute_utility(board, move, sym) < 0:
+        if gBoard.compute_utility(board, move, sym) == -gBoard.k:
             result.set("You lose :(")
             disable_game()
-            return
-
-    result.set("Your Turn!")
+        else:
+            result.set("Your Turn!")
 
 
 
