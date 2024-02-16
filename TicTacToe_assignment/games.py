@@ -157,6 +157,7 @@ def expect_minmax_cutoff(game, state):
 def alpha_beta_search(game, state):
     """Search game to determine best action; use alpha-beta pruning.
     As in [Figure 5.7], this version searches all the way to the leaves."""
+    # Very similar to minimax but with alpha beta pruning
 
     player = game.to_move(state)
 
@@ -186,10 +187,8 @@ def alpha_beta_search(game, state):
         return v
 
     # Body of alpha_beta_search:
-    #v = max_value(state, -np.inf, np.inf)
-    best_action = max(game.actions(state), key=lambda a: max_value(state, -np.inf, np.inf))
     #print("alpha_beta_search: to be completed by students")
-    return best_action
+    return max(game.actions(state), key=lambda a: min_value(game.result(state, a), -np.inf, np.inf))
 
 
 def alpha_beta_cutoff_search(game, state, d=4, cutoff_test=None, eval_fn=None):
@@ -201,7 +200,7 @@ def alpha_beta_cutoff_search(game, state, d=4, cutoff_test=None, eval_fn=None):
 
     # Functions used by alpha_beta
     def max_value(state, alpha, beta, depth):
-        if game.terminal_test(state):
+        if depth == 0 or game.terminal_test(state):
             return game.evaluation_func(state)
         v = -np.inf
         for a in game.actions(state):
@@ -209,10 +208,11 @@ def alpha_beta_cutoff_search(game, state, d=4, cutoff_test=None, eval_fn=None):
             if v >= beta:
                 return v
             alpha = max(alpha, v)
+        #print("alpha_beta_search: max_value: to be completed by student")
         return v
 
     def min_value(state, alpha, beta, depth):
-        if game.terminal_test(state):
+        if depth == 0 or game.terminal_test(state):
             return game.evaluation_func(state)
         v = np.inf
         for a in game.actions(state):
@@ -220,13 +220,13 @@ def alpha_beta_cutoff_search(game, state, d=4, cutoff_test=None, eval_fn=None):
             if v <= alpha:
                 return v
             beta = min(beta, v)
+        #print("alpha_beta_search: min_value: to be completed by student")
         return v
 
     # Body of alpha_beta_search:
-    #v = max_value(state, -np.inf, np.inf)
-    best_action = max(game.actions(state), key=lambda a: max_value(state, -np.inf, np.inf, depth))
     #print("alpha_beta_search: to be completed by students")
-    return best_action
+    return max(game.actions(state), key=lambda a: min_value(game.result_cutoff(state, a), -np.inf, np.inf, depth))
+    
 
 
 # ______________________________________________________________________________
@@ -428,7 +428,7 @@ class TicTacToe(Game):
         if self.to_move == 'X': # if it is players turn, score should be inverse of computer
             score = -score;
         
-        print("Score is " + str(score))
+        #print("Score is " + str(score))
         #print("evaluation_function: to be completed by students")
         return score;
 		
