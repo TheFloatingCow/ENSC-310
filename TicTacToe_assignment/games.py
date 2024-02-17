@@ -92,30 +92,47 @@ def expect_minmax(game, state):
     Return the best move for a player after dice are thrown. The game tree
 	includes chance nodes along with min and max nodes.
 	"""
+ 
     player = game.to_move(state)
 
     def max_value(state):
+        if game.terminal_test(state):
+            return game.utility(state, player)
         v = -np.inf
         for a in game.actions(state):
-            v = max(v, chance_node(state, a))
+            v = max(v, chance_node(game.result(state, a), a))
         return v
 
     def min_value(state):
+        if game.terminal_test(state):
+            return game.utility(state, player)
         v = np.inf
         for a in game.actions(state):
-            v = min(v, chance_node(state, a))
+            v = max(v, chance_node(game.result(state, a), a))
         return v
 
     def chance_node(state, action):
         res_state = game.result(state, action)
-        if game.terminal_test(res_state):
-            return game.utility(res_state, player)
+        if game.terminal_test(state):
+            return game.utility(state, player)
         sum_chances = 0
         num_chances = len(game.chances(res_state))
-        print("chance_node: to be completed by students")
+        #print("chance_node: to be completed by students")
         
-        for chance, next_state in game.chances(res_state):
-            sum_chances += chance * min_value(next_state) if player == game.to_move(next_state) else chance * max_value(next_state)
+        # return the average over all possible outcomes of the chance nodes
+        # sum_chances += probability(successor) * value(successor)
+        index = 0
+        for a in game.actions(state):
+            
+            #p = probability(successor)
+            #sum_chances += p * value(successor)
+            
+            successor_prob = game.chances(state)[index]
+            successor_val = max_value(game.result(state, a))
+            sum_chances += successor_prob * successor_val
+            
+            #sum_chances += max_value(game.result(state, a)) * game.chances(state)[index]
+            index += 1
         return sum_chances
 
     # Body of expect_minmax:
@@ -123,34 +140,51 @@ def expect_minmax(game, state):
 
 def expect_minmax_cutoff(game, state):
     
-    player = game.to_move(state)
+    depth = game.d
 
-    def max_value(state):
+    def max_value(state, depth):
+        if depth == 0 or game.terminal_test(state):
+            return game.evaluation_func(state)
         v = -np.inf
         for a in game.actions(state):
-            v = max(v, chance_node(state, a))
+            v = max(v, chance_node(game.result_cutoff(state, a), a, depth - 1))
         return v
 
-    def min_value(state):
+    def min_value(state, depth):
+        if depth == 0 or game.terminal_test(state):
+            return game.evaluation_func(state)
         v = np.inf
         for a in game.actions(state):
-            v = min(v, chance_node(state, a))
+            v = min(v, chance_node(game.result_cutoff(state, a), a, depth - 1))
         return v
 
-    def chance_node(state, action):
-        res_state = game.result(state, action)
-        if game.terminal_test(res_state):
-            return game.utility(res_state, player)
+    def chance_node(state, action, depth):
+        res_state = game.result_cutoff(state, action)
+        if depth <= 0 or game.terminal_test(state):
+            return game.evaluation_func(state)
         sum_chances = 0
         num_chances = len(game.chances(res_state))
-        print("chance_node: to be completed by students")
+        #print("chance_node: to be completed by students")
         
-        for chance, next_state in game.chances(res_state):
-            sum_chances += chance * min_value(next_state) if player == game.to_move(next_state) else chance * max_value(next_state)
+        # return the average over all possible outcomes of the chance nodes
+        # sum_chances += probability(successor) * value(successor)
+        index = 0
+        for a in game.actions(state):
+            
+            #p = probability(successor)
+            #sum_chances += p * value(successor)
+            
+            successor_prob = game.chances(state)[index]
+            successor_val = max_value(game.result(state, a), depth - 1)
+            sum_chances += successor_prob * successor_val
+            print(sum_chances)
+            
+            #sum_chances += max_value(game.result(state, a), depth - 1) * game.chances(state)[index]
+            index += 1
         return sum_chances
 
     # Body of expect_minmax:
-    return max(game.actions(state), key=lambda a: chance_node(state, a), default=None)
+    return max(game.actions(state), key=lambda a: chance_node(state, a, depth), default=None)
 
 
 
@@ -454,14 +488,12 @@ class TicTacToe(Game):
         
     def chances(self, state):
         """Return a list of all possible states."""
-        print("To be completed by students")
-        if self.terminal_test(state):
-            return []
-        #DOESNT WORK AT ALL
+        #print("To be completed by students")
         chances = []
-        for action in self.actions(state):
-            for chance, next_state in self.result_cutoff(state, action):
-                chances.append((chance, next_state))
+        num_chances = len(self.actions(state))
+        for a in self.actions(state):
+            chance = 1/num_chances
+            chances.append(chance)
         return chances
 
 

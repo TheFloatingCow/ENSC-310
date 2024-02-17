@@ -136,7 +136,7 @@ def on_click(button):
         if "Random" in choice:
             a, b = random_player(gBoard, state2)
         elif "Expectimax" in choice:
-            a, b = expect_minmax(gBoard, state2)
+            a, b = expect_minmax_player(gBoard, state2)
         elif "MinMax" in choice:
             a, b = minmax_player(gBoard, state2)
         else:
