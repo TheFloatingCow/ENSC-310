@@ -81,7 +81,7 @@ def minmax_cutoff(game, state):
 
     #print("minmax_cutoff: to be done by students")
     # Body of minmax_decision:
-    return max(game.actions(state), key=lambda a: min_value(game.result(state, a), depth))
+    return max(game.actions(state), key=lambda a: min_value(game.result_cutoff(state, a), depth))
 
 # ______________________________________________________________________________
 
@@ -100,7 +100,7 @@ def expect_minmax(game, state):
             return game.utility(state, player)
         v = -np.inf
         for a in game.actions(state):
-            v = max(v, chance_node(game.result(state, a), a))
+            v = max(v, chance_node(game.result(state, a)))
         return v
 
     def min_value(state):
@@ -108,15 +108,14 @@ def expect_minmax(game, state):
             return game.utility(state, player)
         v = np.inf
         for a in game.actions(state):
-            v = max(v, chance_node(game.result(state, a), a))
+            v = min(v, chance_node(game.result(state, a)))
         return v
 
-    def chance_node(state, action):
-        res_state = game.result(state, action)
+    def chance_node(state):
         if game.terminal_test(state):
             return game.utility(state, player)
         sum_chances = 0
-        num_chances = len(game.chances(res_state))
+        num_chances = len(game.chances(state))
         #print("chance_node: to be completed by students")
         
         # return the average over all possible outcomes of the chance nodes
@@ -136,7 +135,7 @@ def expect_minmax(game, state):
         return sum_chances
 
     # Body of expect_minmax:
-    return max(game.actions(state), key=lambda a: chance_node(state, a), default=None)
+    return max(game.actions(state), key=lambda a: min_value(game.result(state, a)), default=None)
 
 def expect_minmax_cutoff(game, state):
     
@@ -147,7 +146,7 @@ def expect_minmax_cutoff(game, state):
             return game.evaluation_func(state)
         v = -np.inf
         for a in game.actions(state):
-            v = max(v, chance_node(game.result_cutoff(state, a), a, depth - 1))
+            v = max(v, chance_node(game.result_cutoff(state, a), depth - 1))
         return v
 
     def min_value(state, depth):
@@ -155,15 +154,14 @@ def expect_minmax_cutoff(game, state):
             return game.evaluation_func(state)
         v = np.inf
         for a in game.actions(state):
-            v = min(v, chance_node(game.result_cutoff(state, a), a, depth - 1))
+            v = min(v, chance_node(game.result_cutoff(state, a), depth - 1))
         return v
 
-    def chance_node(state, action, depth):
-        res_state = game.result_cutoff(state, action)
-        if depth <= 0 or game.terminal_test(state):
+    def chance_node(state, depth):
+        if depth == 0 or game.terminal_test(state):
             return game.evaluation_func(state)
         sum_chances = 0
-        num_chances = len(game.chances(res_state))
+        num_chances = len(game.chances(state))
         #print("chance_node: to be completed by students")
         
         # return the average over all possible outcomes of the chance nodes
@@ -175,17 +173,15 @@ def expect_minmax_cutoff(game, state):
             #sum_chances += p * value(successor)
             
             successor_prob = game.chances(state)[index]
-            successor_val = max_value(game.result(state, a), depth - 1)
+            successor_val = max_value(game.result_cutoff(state, a), depth - 1)
             sum_chances += successor_prob * successor_val
-            print(sum_chances)
             
             #sum_chances += max_value(game.result(state, a), depth - 1) * game.chances(state)[index]
             index += 1
         return sum_chances
 
     # Body of expect_minmax:
-    return max(game.actions(state), key=lambda a: chance_node(state, a, depth), default=None)
-
+    return max(game.actions(state), key=lambda a: min_value(game.result_cutoff(state, a), depth), default=None)
 
 
 def alpha_beta_search(game, state):
