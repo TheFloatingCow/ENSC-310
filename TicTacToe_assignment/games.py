@@ -404,11 +404,9 @@ class TicTacToe(Game):
         """Start with 1, each increase in number increases points by x10. All they way to k"""
         
         score = 0;
-        # start with X (player)
-        # negative points
+        # start with X (player), the do O (computer)
         # list(state.board.keys())[0]
         for index in range(self.k):
-            
             
             if self.k_in_row(state.board, list(state.board.keys())[0], 'X', (0, 1), index + 1):
                 score -= 10 ** index;
@@ -418,11 +416,6 @@ class TicTacToe(Game):
                 score -= 10 ** index;
             if self.k_in_row(state.board, list(state.board.keys())[0], 'X', (1, 1), index + 1):
                 score -= 10 ** index;
-        # then do O (computer)
-        # positive points
-        for index in range(self.k):
-            
-            
             if self.k_in_row(state.board, list(state.board.keys())[0], 'O', (0, 1), index + 1):
                 score += 10 ** index;
             if self.k_in_row(state.board, list(state.board.keys())[0], 'O', (1, 0), index + 1):
@@ -435,7 +428,7 @@ class TicTacToe(Game):
         if self.to_move == 'X': # if it is players turn, score should be inverse of computer
             score = -score;
         
-        print("Score is " + str(score))
+        #print("Score is " + str(score))
         #print("evaluation_function: to be completed by students")
         return score;
 		
