@@ -35,9 +35,9 @@ Rubric for Grading:
 PLAN (in order)
 k_in_row          DONE?
 evaluation_func   SUCKS
-Chance
+Chance            
 minimax_cutoff    DONE?
-AlphaBeta         DONE?
-alphabeta_cutoff  DONE?
-ExpectiMax
-expectimax_cutoff
+AlphaBeta         DONE
+alphabeta_cutoff  DONE after evaluation?
+ExpectiMax        
+expectimax_cutoff 
