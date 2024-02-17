@@ -33,10 +33,10 @@ Rubric for Grading:
 
 
 PLAN (in order)
-k_in_row          DONE?
-evaluation_func   SUCKS
+k_in_row          works but might change later
+evaluation_func   somewhat works
 Chance            
-minimax_cutoff    DONE?
+minimax_cutoff    DONE after evaluation?
 AlphaBeta         DONE
 alphabeta_cutoff  DONE after evaluation?
 ExpectiMax        
