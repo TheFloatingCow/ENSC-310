@@ -64,7 +64,7 @@ def minmax_cutoff(game, state):
     depth = game.d
 
     def max_value(state, depth):
-        if depth == 0 or game.terminal_test(state):
+        if depth <= 0 or game.terminal_test(state):
             return game.evaluation_func(state)
         v = -np.inf
         for a in game.actions(state):
@@ -72,7 +72,7 @@ def minmax_cutoff(game, state):
         return v
 
     def min_value(state, depth):
-        if depth == 0 or game.terminal_test(state):
+        if depth <= 0 or game.terminal_test(state):
             return game.evaluation_func(state)
         v = np.inf
         for a in game.actions(state):
@@ -142,7 +142,7 @@ def expect_minmax_cutoff(game, state):
     depth = game.d
 
     def max_value(state, depth):
-        if depth == 0 or game.terminal_test(state):
+        if depth <= 0 or game.terminal_test(state):
             return game.evaluation_func(state)
         v = -np.inf
         for a in game.actions(state):
@@ -150,7 +150,7 @@ def expect_minmax_cutoff(game, state):
         return v
 
     def min_value(state, depth):
-        if depth == 0 or game.terminal_test(state):
+        if depth <= 0 or game.terminal_test(state):
             return game.evaluation_func(state)
         v = np.inf
         for a in game.actions(state):
@@ -158,7 +158,7 @@ def expect_minmax_cutoff(game, state):
         return v
 
     def chance_node(state, depth):
-        if depth == 0 or game.terminal_test(state):
+        if depth <= 0 or game.terminal_test(state):
             return game.evaluation_func(state)
         sum_chances = 0
         num_chances = len(game.chances(state))
@@ -230,7 +230,7 @@ def alpha_beta_cutoff_search(game, state, d=4, cutoff_test=None, eval_fn=None):
 
     # Functions used by alpha_beta
     def max_value(state, alpha, beta, depth):
-        if depth == 0 or game.terminal_test(state):
+        if depth <= 0 or game.terminal_test(state):
             return game.evaluation_func(state)
         v = -np.inf
         for a in game.actions(state):
@@ -242,7 +242,7 @@ def alpha_beta_cutoff_search(game, state, d=4, cutoff_test=None, eval_fn=None):
         return v
 
     def min_value(state, alpha, beta, depth):
-        if depth == 0 or game.terminal_test(state):
+        if depth <= 0 or game.terminal_test(state):
             return game.evaluation_func(state)
         v = np.inf
         for a in game.actions(state):
