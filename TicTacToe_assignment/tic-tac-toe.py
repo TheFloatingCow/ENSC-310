@@ -21,8 +21,8 @@ choices = None
 gheight = 4
 gwidth = 4
 gkmatch = 4
-gdepth = -1 # -1 means search cutoff depth set to leaf level.
-
+gdepth = 2 # -1 means search cutoff depth set to leaf level.
+# depth for expectimax = 2
 
 
 def create_frames(root):
@@ -52,7 +52,7 @@ def create_frames(root):
     depthLabel.pack(side=LEFT)
 
     depthStr = StringVar()
-    depthStr.set(str("-1"))  # -1 means search depth set to max, meaning to terminal state.
+    depthStr.set(str(gdepth))  # -1 means search depth set to max, meaning to terminal state.
     
     def depthCallback(event):
         global gdepth

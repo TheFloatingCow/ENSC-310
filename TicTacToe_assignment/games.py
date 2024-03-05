@@ -61,19 +61,23 @@ def minmax_cutoff(game, state):
     """Given a state in a game, calculate the best move by searching
     forward all the way to the cutoff depth. At that level use evaluation func."""
     
+    """Replace result (which computes utility) with result_cutoff (with evaluation function)
+    so that game.utility(state, player) returns the evaluation stored in utility var"""
+    
+    player = game.to_move(state)
     depth = game.d
 
     def max_value(state, depth):
-        if depth <= 0 or game.terminal_test(state):
-            return game.evaluation_func(state)
+        if depth <= 0:
+            return game.utility(state, player)
         v = -np.inf
         for a in game.actions(state):
             v = max(v, min_value(game.result_cutoff(state, a), depth - 1))
         return v
 
     def min_value(state, depth):
-        if depth <= 0 or game.terminal_test(state):
-            return game.evaluation_func(state)
+        if depth <= 0:
+            return game.utility(state, player)
         v = np.inf
         for a in game.actions(state):
             v = min(v, max_value(game.result_cutoff(state, a), depth - 1))
@@ -139,27 +143,31 @@ def expect_minmax(game, state):
 
 def expect_minmax_cutoff(game, state):
     
+    """Replace result (which computes utility) with result_cutoff (with evaluation function)
+    so that game.utility(state, player) returns the evaluation stored in utility var"""
+    
+    player = game.to_move(state)
     depth = game.d
 
     def max_value(state, depth):
-        if depth <= 0 or game.terminal_test(state):
-            return game.evaluation_func(state)
+        if depth <= 0:
+            return game.utility(state, player)
         v = -np.inf
         for a in game.actions(state):
             v = max(v, chance_node(game.result_cutoff(state, a), depth - 1))
         return v
 
     def min_value(state, depth):
-        if depth <= 0 or game.terminal_test(state):
-            return game.evaluation_func(state)
+        if depth <= 0:
+            return game.utility(state, player)
         v = np.inf
         for a in game.actions(state):
             v = min(v, chance_node(game.result_cutoff(state, a), depth - 1))
         return v
 
     def chance_node(state, depth):
-        if depth <= 0 or game.terminal_test(state):
-            return game.evaluation_func(state)
+        if depth <= 0:
+            return game.utility(state, state)
         sum_chances = 0
         num_chances = len(game.chances(state))
         #print("chance_node: to be completed by students")
@@ -173,7 +181,8 @@ def expect_minmax_cutoff(game, state):
             #sum_chances += p * value(successor)
             
             successor_prob = game.chances(state)[index]
-            successor_val = max_value(game.result_cutoff(state, a), depth - 1)
+            # using min_value here instead of max_value because all the evaluations are inverted
+            successor_val = min_value(game.result_cutoff(state, a), depth - 1)
             sum_chances += successor_prob * successor_val
             
             #sum_chances += max_value(game.result(state, a), depth - 1) * game.chances(state)[index]
@@ -224,14 +233,19 @@ def alpha_beta_search(game, state):
 def alpha_beta_cutoff_search(game, state, d=4, cutoff_test=None, eval_fn=None):
     """Search game to determine best action; use alpha-beta pruning.
     This version cuts off search and uses an evaluation function."""
+    
+    """Replace result (which computes utility) with result_cutoff (with evaluation function)
+    so that game.utility(state, player) returns the evaluation stored in utility var"""
+    
     #print("alpha_beta_cutoff_search: may be used, if so, must be implemented by students")
     
+    player = game.to_move(state)
     depth = game.d
 
     # Functions used by alpha_beta
     def max_value(state, alpha, beta, depth):
-        if depth <= 0 or game.terminal_test(state):
-            return game.evaluation_func(state)
+        if depth <= 0:
+            return game.utility(state, player)
         v = -np.inf
         for a in game.actions(state):
             v = max(v, min_value(game.result_cutoff(state, a), alpha, beta, depth - 1))
@@ -242,8 +256,8 @@ def alpha_beta_cutoff_search(game, state, d=4, cutoff_test=None, eval_fn=None):
         return v
 
     def min_value(state, alpha, beta, depth):
-        if depth <= 0 or game.terminal_test(state):
-            return game.evaluation_func(state)
+        if depth <= 0:
+            return game.utility(state, player)
         v = np.inf
         for a in game.actions(state):
             v = min(v, max_value(game.result_cutoff(state, a), alpha, beta, depth - 1))
@@ -435,28 +449,29 @@ class TicTacToe(Game):
         
         score = 0;
         # start with X (player), the do O (computer)
-        # list(state.board.keys())[0]
+        # list(state.board.keys())[0] (most recent move)
         for index in range(self.k):
             
             if self.k_in_row(state.board, list(state.board.keys())[0], 'X', (0, 1), index + 1):
-                score -= 10 ** index;
+                score += 10 ** index;
             if self.k_in_row(state.board, list(state.board.keys())[0], 'X', (1, 0), index + 1):
-                score -= 10 ** index;
+                score += 10 ** index;
             if self.k_in_row(state.board, list(state.board.keys())[0], 'X', (1, -1), index + 1):
-                score -= 10 ** index;
+                score += 10 ** index;
             if self.k_in_row(state.board, list(state.board.keys())[0], 'X', (1, 1), index + 1):
-                score -= 10 ** index;
+                score += 10 ** index;
             if self.k_in_row(state.board, list(state.board.keys())[0], 'O', (0, 1), index + 1):
-                score += 10 ** index;
+                score -= 10 ** index;
             if self.k_in_row(state.board, list(state.board.keys())[0], 'O', (1, 0), index + 1):
-                score += 10 ** index;
+                score -= 10 ** index;
             if self.k_in_row(state.board, list(state.board.keys())[0], 'O', (1, -1), index + 1):
-                score += 10 ** index;
+                score -= 10 ** index;
             if self.k_in_row(state.board, list(state.board.keys())[0], 'O', (1, 1), index + 1):
-                score += 10 ** index;
+                score -= 10 ** index;
                 
-        if self.to_move == 'X': # if it is players turn, score should be inverse of computer
-            score = -score;
+        # This will now be done in utility() function
+        #if self.to_move == 'O': # if it is players turn, score should be inverse of computer
+        #    score = -score;
         
         #print("Score is " + str(score))
         #print("evaluation_function: to be completed by students")
@@ -485,10 +500,53 @@ class TicTacToe(Game):
     def chances(self, state):
         """Return a list of all possible states."""
         #print("To be completed by students")
+        
+        """Player is most likely smart
+        Split highest odds to best move(s)
+            50% they make best move(s)
+        Split lowest odds to worst move(s)
+            0.1% they make worst move(s)
+        Split rest evenly
+        
+        Evaluation stored in utility so can use utility for any depth
+        
+        Total = 50% + 0.1% + rest
+        rest = 49.9/(n-best&worst)
+        """
+        
         chances = []
         num_chances = len(self.actions(state))
+        
+        evals = []
+        for a in self.actions(state): # make a list of every evaluation
+            evals.append(-self.utility(state, self.to_move(state))) # make them all positive QOL
+        
+        if not evals:
+            return chances
+        
+        highestEval = max(evals);
+        lowestEval = min(evals);
+        
+        if highestEval == lowestEval: # all evaluations are the same: all chances the same
+            for a in self.actions(state):
+                chance = 1/num_chances
+                chances.append(chance)
+            return chances
+        
+        numOfBest = evals.count(highestEval)
+        numOfWorst = evals.count(lowestEval)
+        
         for a in self.actions(state):
-            chance = 1/num_chances
+            
+            eval = -self.utility(state, self.to_move(state))
+            
+            if eval == highestEval:
+                chance = 0.5/numOfBest
+            elif eval == lowestEval:
+                chance = 0.001/numOfWorst
+            else:
+                chance = 0.499/(num_chances - numOfBest - numOfWorst)
+            
             chances.append(chance)
         return chances
 

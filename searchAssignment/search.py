@@ -203,6 +203,7 @@ def best_first_graph_search(problem, f=None):
             return None, None
         node = frontier.pop()
         if problem.goal_test(node.state):
+            print(node)
             return node, explored
         explored.add(tuple(node.state))
         

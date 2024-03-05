@@ -14,7 +14,7 @@ one, and make it smarter later. This Evaluation function is used anywhere cutoff
     i) Total probabilities for all choices at a node should be 1
     ii)In simple case use equal probability to start with. Later, once it is working, inject some smartness into it. 
     iii)Remember, Chance node in Expectimax must be at the cutoff depth level. All the layers above it tillt the root are MinMax levels.
-    iv) One suggestion is to consider the blocking of the opponents as factor in the probability assignment. For example 
+    iv) One suggestion is to consider the blocking off the opponents as factor in the probability assignment. For example 
         if the opponent is about to win with the next move you make, then give it lower probability to this move, so to lower the
         likelyhood of making that move.
 
@@ -33,11 +33,11 @@ Rubric for Grading:
 
 
 PLAN (in order)
-k_in_row          works but might change later
-evaluation_func   somewhat works
-Chance            
-minimax_cutoff    DONE after evaluation?
+k_in_row          works
+evaluation_func   Works
+Chance            Works
+minimax_cutoff    DONE
 AlphaBeta         DONE
-alphabeta_cutoff  DONE after evaluation?
-ExpectiMax        
-expectimax_cutoff 
+alphabeta_cutoff  DONE
+ExpectiMax        DONE
+expectimax_cutoff DONE
