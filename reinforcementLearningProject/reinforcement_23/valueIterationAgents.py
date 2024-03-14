@@ -145,7 +145,7 @@ class PrioritizedSweepingValueIterationAgent(ValueIterationAgent):
         for state in self.mdp.getStates():
             for action in self.mdp.getPossibleActions(state):
                 for nextState, prob in self.mdp.getTransitionStatesAndProbs(state, action):
-                    if prob > 0:
+                    if prob != 0:
                         predecessors[nextState].add(state)
                 
         # Initialize an empty priority queue
