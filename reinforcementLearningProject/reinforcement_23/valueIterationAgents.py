@@ -12,20 +12,6 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
-# valueIterationAgents.py
-# -----------------------
-# Licensing Information:  You are free to use or extend these projects for
-# educational purposes provided that (1) you do not distribute or publish
-# solutions, (2) you retain this notice, and (3) you provide clear
-# attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
-# Attribution Information: The Pacman AI projects were developed at UC Berkeley.
-# The core projects and autograders were primarily created by John DeNero
-# (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
-# Student side autograding was added by Brad Miller, Nick Hay, and
-# Pieter Abbeel (pabbeel@cs.berkeley.edu).
-
-
 import mdp, util
 
 from learningAgents import ValueEstimationAgent
@@ -61,8 +47,18 @@ class ValueIterationAgent(ValueEstimationAgent):
 
     def runValueIteration(self):
         # Write value iteration code here
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        "*** YOUR CODE HERE DONE *** -----------------------------------------------------------------------------"
+        for index in range(self.iterations):
+            Q = util.Counter()
+            
+            for state in self.mdp.getStates():
+                if self.mdp.isTerminal(state):
+                    continue
+                else:
+                    Q[state] = max([self.computeQValueFromValues(state, action) for action in self.mdp.getPossibleActions(state)])
+
+            self.values = Q;
+        #util.raiseNotDefined()
 
 
     def getValue(self, state):
@@ -77,8 +73,13 @@ class ValueIterationAgent(ValueEstimationAgent):
           Compute the Q-value of action in state from the
           value function stored in self.values.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        "*** YOUR CODE HERE DONE *** -----------------------------------------------------------------------------"
+        # Q(s, a) = sum T(s, a, s') [R(s, a, s') + discount * V*(s')]
+        total = 0
+        for nextState, prob in self.mdp.getTransitionStatesAndProbs(state, action):
+            total += prob * (self.mdp.getReward(state, action, nextState) + self.discount * self.values[nextState])
+        return total
+        #util.raiseNotDefined()
 
 
     def computeActionFromValues(self, state):
@@ -90,15 +91,26 @@ class ValueIterationAgent(ValueEstimationAgent):
           there are no legal actions, which is the case at the
           terminal state, you should return None.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        "*** YOUR CODE HERE DONE *** -----------------------------------------------------------------------------"
+        if self.mdp.isTerminal(state):
+            return None
+ 
+        actions = []
+        actionValues = []
+        for action in self.mdp.getPossibleActions(state):
+            actions.append(action)
+            actionValues.append(self.computeQValueFromValues(state, action))
+        maxIndex = actionValues.index(max(actionValues))
+        return (actions[maxIndex])
+        #util.raiseNotDefined()
 
 
 
     def getPolicy(self, state):
         "Returns the policy at the state."
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        "*** YOUR CODE HERE DONE *** -----------------------------------------------------------------------------"
+        return self.computeActionFromValues(state)
+        #util.raiseNotDefined()
 
 
     def getAction(self, state):
@@ -127,5 +139,55 @@ class PrioritizedSweepingValueIterationAgent(ValueIterationAgent):
         ValueIterationAgent.__init__(self, mdp, discount, iterations)
 
     def runValueIteration(self):
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        "*** YOUR CODE HERE DONE *** -----------------------------------------------------------------------------"
+        # Compute predecessors of all states
+        predecessors = collections.defaultdict(set)
+        for state in self.mdp.getStates():
+            for action in self.mdp.getPossibleActions(state):
+                for nextState, prob in self.mdp.getTransitionStatesAndProbs(state, action):
+                    if prob > 0:
+                        predecessors[nextState].add(state)
+                
+        # Initialize an empty priority queue
+        priorityQueue = util.PriorityQueue()
+
+        # For each non-terminal state s, do:
+        for s in self.mdp.getStates():
+            if not self.mdp.isTerminal(s):
+                        
+                # Find the absolute value of the difference between the current value of s in self.values and the
+                # highest Q-value across all possible actions from s;
+                # call this number diff
+                diff = abs(self.values[s] - max(self.getQValue(s, action) for action in self.mdp.getPossibleActions(s)))
+                
+                # Push s into the priority queue with priority -diff
+                priorityQueue.push(s, -diff)
+
+        # For iteration in 0, 1, 2, ..., self.iterations - 1, do:
+        for index in range(self.iterations):
+            
+            # If the priority queue is empty, then terminate                   
+            if priorityQueue.isEmpty():
+                break
+            
+            # Pop a state s off the priority queue
+            s = priorityQueue.pop()
+            
+            # Update the value of s (if it is not a terminal state) in self.values
+            if not self.mdp.isTerminal(s):
+                self.values[s] = max(self.getQValue(s, action) for action in self.mdp.getPossibleActions(s))
+            
+            # For each predecessor p of s, do:
+            for p in predecessors[s]:
+                
+                # Find the absolute value of the difference between the current value of p in self.values and the
+                # highest Q-value across all possible actions from p;
+                # call this number diff
+                diff = abs(self.values[p] - max(self.getQValue(p, action) for action in self.mdp.getPossibleActions(p)))
+                
+                # If diff > theta, push p into the priority queue with priority -diff
+                if diff > self.theta:
+                    # Update checks if it is already in the queue
+                    priorityQueue.update(p, -diff)
+                    
+        #util.raiseNotDefined()
