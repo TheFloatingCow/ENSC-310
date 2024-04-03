@@ -50,14 +50,16 @@ class PerceptronClassifier:
             print("Starting iteration ", iteration, "...")
             for i in range(len(trainingData)):
                 "*** YOUR CODE HERE ***"
-                util.raiseNotDefined()
+                #util.raiseNotDefined()
                 #compute score for each label:
-
+                f = trainingData[i]
+                yprime = trainingLabels[i]
                 #find the most optimum label:
-
-
+                y = self.classify([f])[0]
                 #update weight if necessary:
-
+                if yprime != y:
+                    self.weights[yprime] += f
+                    self.weights[y] -= f
 
         print("finished training")
 
@@ -74,7 +76,9 @@ class PerceptronClassifier:
         for datum in data:
             vectors = util.Counter()
             "*** YOUR CODE HERE ***"
-            util.raiseNotDefined()
+            for index in self.legalLabels:
+                vectors[index] = self.weights[index] * datum
+            #util.raiseNotDefined()
             guesses.append(vectors.argMax())
         return guesses
 
@@ -86,6 +90,9 @@ class PerceptronClassifier:
         featuresWeights = []
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        sortedFeatures = sorted(self.weights[label], reverse = True)
+        for i in range(100):
+            featuresWeights.append(sortedFeatures[:100])
+        #util.raiseNotDefined()
 
         return featuresWeights
