@@ -77,7 +77,12 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
             datum = trainingData[i]
             label = trainingLabels[i]
             "*** YOUR CODE HERE to complete populating commonPrior, commonCounts, and commonConditionalProb ***"
-            util.raiseNotDefined()
+            # util.raiseNotDefined()
+            commonPrior[label] += 1
+            for feat, count in datum.items():
+                commonCounts[(feat, label)] += 1
+                if count > 0:
+                    commonConditionalProb[(feat, label)] += 1
 
         for k in kgrid: # Smoothing parameter tuning loop!
             prior = util.Counter()
@@ -95,8 +100,10 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
             # smoothing:
             for label in self.legalLabels:
                 for feat in self.features:
-                    "*** YOUR CODE HERE to update conditionalProb and counts using Lablace smoothing ***"
-                    util.raiseNotDefined()
+                    "*** YOUR CODE HERE to update conditionalProb and counts using Laplace smoothing ***"
+                    # util.raiseNotDefined()
+                    counts[(feat, label)] += 2 * k
+                    conditionalProb[(feat, label)] += k
 
 
             # normalizing:
@@ -146,7 +153,13 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
 
         for label in self.legalLabels:
             "*** YOUR CODE HERE, to populate logJoint() list ***"
-            util.raiseNotDefined()
+            # util.raiseNotDefined()
+            logJoint[label] = math.log(self.prior[label])
+            for feat, count in datum.items():
+                if count > 0:
+                    logJoint[label] += math.log(self.conditionalProb[feat, label])
+                else:
+                    logJoint[label] += math.log(1 - self.conditionalProb[feat, label])
         return logJoint
 
     def findHighOddsFeatures(self, label1, label2):
@@ -159,6 +172,11 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
         featuresOdds = []
 
         "*** YOUR CODE HERE, to populate featureOdds based on above formula. ***"
-        util.raiseNotDefined()
+        # util.raiseNotDefined()
+        for feat in self.features:
+            ratio = self.conditionalProb[feat, label1] / self.conditionalProb[feat, label2]
+            featuresOdds.append((ratio, feat))
+        featuresOdds.sort()
+        featuresOdds = [feat for value, feat in featuresOdds[-100:]]
 
         return featuresOdds
