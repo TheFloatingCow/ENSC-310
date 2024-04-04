@@ -9,6 +9,7 @@
 
 # Mira implementation
 import util
+
 PRINT = True
 
 
@@ -19,6 +20,7 @@ class MiraClassifier:
     Note that the variable 'datum' in this code refers to a counter of features
     (not to a raw samples.Datum).
     """
+
     def __init__(self, legalLabels, max_iterations):
         self.legalLabels = legalLabels
         self.type = "mira"
@@ -32,7 +34,7 @@ class MiraClassifier:
         "Resets the weights of each label to zero vectors"
         self.weights = {}
         for label in self.legalLabels:
-            self.weights[label] = util.Counter() # this is the data-structure you should use
+            self.weights[label] = util.Counter()  # this is the data-structure you should use
 
     def setWeights(self, weights):
         assert len(weights) == len(self.legalLabels)
@@ -41,7 +43,7 @@ class MiraClassifier:
     def train(self, trainingData, trainingLabels, validationData, validationLabels):
         "Outside shell to call your method. Do not modify this method."
 
-        self.features = trainingData[0].keys() # this could be useful for your code later...
+        self.features = trainingData[0].keys()  # this could be useful for your code later...
 
         if (self.automaticTuning):
             cGrid = [0.001, 0.002, 0.004, 0.008]
@@ -66,7 +68,20 @@ class MiraClassifier:
         bestParams = cGrid[0]
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # util.raiseNotDefined()
+        for c in cGrid:
+            self.weights = self.weights.copy()
+            for n in range(self.max_iterations):
+                for i in range(len(trainingData)):
+                    data = trainingData[i]
+                    yprime = trainingLabels[i]
+                    y = self.classify([data])[0]
+                    if yprime != y:
+                        f = data.copy()
+                        t = min(c, ((self.weights[y] - self.weights[yprime]) * f + 1) / (2 * (f * f)))
+                        f.divideAll(1.0 / t)
+                        self.weights[yprime] += f
+                        self.weights[y] -= f
 
         print("finished training. Best cGrid param = ", bestParams)
 
@@ -78,10 +93,14 @@ class MiraClassifier:
         Recall that a datum is a util.counter...
         """
         guesses = []
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        for datum in data:
+            vectors = util.Counter()
+            "*** YOUR CODE HERE ***"
+            for index in self.legalLabels:
+                vectors[index] = self.weights[index] * datum
+            # util.raiseNotDefined()
+            guesses.append(vectors.argMax())
         return guesses
-
 
     def findHighWeightFeatures(self, label):
         """
@@ -90,6 +109,9 @@ class MiraClassifier:
         featuresWeights = []
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        sortedFeatures = sorted(self.weights[label], reverse=True)
+        for i in range(100):
+            featuresWeights.append(sortedFeatures[:100])
+        # util.raiseNotDefined()
 
         return featuresWeights
