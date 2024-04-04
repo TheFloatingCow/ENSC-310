@@ -62,13 +62,23 @@ def enhancedFeatureExtractorDigit(datum):
     for this datum (datum is of type samples.Datum).
 
     ## DESCRIBE YOUR ENHANCED FEATURES HERE...
-
+    Number of gaps between black pixels
     ##
     """
     features = basicFeatureExtractorDigit(datum)
 
     "*** YOUR CODE HERE to extract and add enhanced features to features list ***"
-    util.raiseNotDefined()
+    # util.raiseNotDefined()
+
+    gaps = 0
+
+    for x in range(DIGIT_DATUM_WIDTH - 1):
+        for y in range(DIGIT_DATUM_HEIGHT - 1):
+            if datum.getPixel(x, y) != datum.getPixel(x, y - 1):
+                gaps += 1
+
+    for n in range(10):
+        features[n] = gaps > 87 and 1.0 or 0.0
 
     return features
 
@@ -254,7 +264,7 @@ def runClassifier(args, options):
     featureFunction = args['featureFunction']
     classifier = args['classifier']
     printImage = args['printImage']
-    
+
     # Load data
     numTraining = options.training
     numTest = options.test
