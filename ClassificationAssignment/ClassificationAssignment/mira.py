@@ -70,18 +70,25 @@ class MiraClassifier:
         "*** YOUR CODE HERE ***"
         # util.raiseNotDefined()
         for c in cGrid:
-            self.weights = self.weights.copy()
             for n in range(self.max_iterations):
                 for i in range(len(trainingData)):
                     data = trainingData[i]
                     yprime = trainingLabels[i]
                     y = self.classify([data])[0]
-                    if yprime != y:
+                    if y != yprime:
                         f = data.copy()
                         t = min(c, ((self.weights[y] - self.weights[yprime]) * f + 1) / (2 * (f * f)))
                         f.divideAll(1.0 / t)
                         self.weights[yprime] += f
                         self.weights[y] -= f
+            correct = 0
+            guesses = self.classify(validationData)
+            for i in range(len(guesses)):
+                if validationLabels[i] == guesses[i]:
+                    correct += 1
+            if correct > bestAccuracyCount:
+                bestAccuracyCount = correct
+                bestParams = self.weights
 
         print("finished training. Best cGrid param = ", bestParams)
 

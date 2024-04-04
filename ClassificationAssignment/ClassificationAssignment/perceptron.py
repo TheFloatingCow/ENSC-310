@@ -60,7 +60,7 @@ class PerceptronClassifier:
                 # find the most optimum label:
                 y = self.classify([f])[0]
                 # update weight if necessary:
-                if yprime != y:
+                if y != yprime:
                     self.weights[yprime] += f
                     self.weights[y] -= f
 
